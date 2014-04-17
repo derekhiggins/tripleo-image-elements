@@ -1,0 +1,24 @@
+#!/bin/bash
+set -eux
+
+# Do this here so it won't undo all the good systend replacing later
+yum update -y
+
+# systemd isn't working in the container so replace it 
+mv /usr/bin/systemctl /usr/bin/systemctl-old
+
+cat - <<-EOF > /usr/bin/systemctl
+#!/bin/bash
+
+
+if [[ "\$1" =~ ^.*start\$ ]] ; then
+
+    SERVICE=\${2%%.service}.service
+
+    USER=\$(grep 'User=' /usr/lib/systemd/system/\$SERVICE | cut -d = -f 2)
+    USER=\${USER:-root}
+    COMMAND=\$(grep 'ExecStart=' /usr/lib/systemd/system/\$SERVICE | cut -d = -f 2)
+    sudo -u \$USER \$COMMAND > /var/log/\$2.log 2>&1 &
+fi
+EOF
+chmod +x /usr/bin/systemctl

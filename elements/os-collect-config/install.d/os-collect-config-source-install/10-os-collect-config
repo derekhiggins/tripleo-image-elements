@@ -33,6 +33,10 @@ command=os-refresh-config
 eof
 chmod 600 /etc/os-collect-config.conf
 
+if [ "$CREATE_DOCKER_IMAGE" == "1" ] ; then
+    echo 'os-collect-config >> /var/log/os-collect-config.log 2>&1 &' >> /bin/run-container
+fi
+
 if [ "$DIB_INIT_SYSTEM" == "upstart" ] ; then
     cat > /etc/init/os-collect-config.conf <<eof
 start on runlevel [2345]

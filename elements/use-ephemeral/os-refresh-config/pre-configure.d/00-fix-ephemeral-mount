@@ -15,4 +15,5 @@ if grep -q "^$ephemeraldisk " /proc/mounts ; then
     exit 0
 fi
 
-mount $ephemeraldisk /mnt
+# Err
+#mount $ephemeraldisk /mnt
